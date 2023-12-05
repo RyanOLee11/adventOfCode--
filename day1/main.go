@@ -23,7 +23,7 @@ func main() {
 	// we will use this slice to store the numbers
 	numbers := []int{}
 
-	//s initialize the lineNumbers struct
+	// initialize the lineNumbers struct
 	// we will use this to store the numbers from each line
 	lineNumbers := lineNumbers{}
 
