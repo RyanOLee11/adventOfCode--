@@ -55,9 +55,6 @@ func main() {
 					}
 					if symbolFound {
 						correctNumbers = append(correctNumbers, number)
-						if len(currentNumber) == 2 {
-							gearRatios = append(gearRatios, number)
-						}
 					}
 					currentNumber = ""
 					symbolFound = false
@@ -66,7 +63,11 @@ func main() {
 			}
 
 			if col == "*" {
-				checkAroundStar(matrix, rowIndex, colIndex)
+				l_temp :=  checkAroundStar(matrix, rowIndex, colIndex)
+				if len(l_temp) == 2 {
+					gearRatios = append(gearRatios, l_temp[0] * l_temp[1])
+					//fmt.Println(l_temp[0] , l_temp[1])
+				}
 			}
 		}
 	}
@@ -134,8 +135,86 @@ func checkAroundChar(pMatrix [][]string, pRow int, pCol int) (bool, string) {
 func checkForSpecialChar(s string) bool {
 	b := (unicode.IsLetter([]rune(s)[0]) || unicode.IsNumber([]rune(s)[0]) || s == ".")
 	if !b {
-		fmt.Println(s)
+		//fmt.Println(s)
 	}
 	return !b
+}
 
+func checkAroundStar(pMatrix [][]string, pRow int, pCol int) []int {
+	numbersAroundStar := []int{}
+
+	if pRow > 0 {
+		if unicode.IsNumber([]rune(pMatrix[pRow-1][pCol])[0]) {
+			numbersAroundStar = appendIfNotExists(numbersAroundStar, getNumberFromMatrix(pMatrix, pRow-1, pCol))
+		}
+		if (pCol-1) >= 0 && unicode.IsNumber([]rune(pMatrix[pRow-1][pCol-1])[0]) {
+			numbersAroundStar = appendIfNotExists(numbersAroundStar, getNumberFromMatrix(pMatrix, pRow-1, pCol-1))
+		}
+		if (pCol+1) <= len(pMatrix[pRow])-1 && unicode.IsNumber([]rune(pMatrix[pRow-1][pCol+1])[0]) {
+			numbersAroundStar = appendIfNotExists(numbersAroundStar, getNumberFromMatrix(pMatrix, pRow-1, pCol+1))
+		}
+	}
+
+	// Check the row below
+	if pRow < len(pMatrix)-1 {
+		if unicode.IsNumber([]rune(pMatrix[pRow+1][pCol])[0]) {
+			numbersAroundStar = appendIfNotExists(numbersAroundStar, getNumberFromMatrix(pMatrix, pRow+1, pCol))
+		}
+		if (pCol-1) >= 0 && unicode.IsNumber([]rune(pMatrix[pRow+1][pCol-1])[0]) {
+			numbersAroundStar = appendIfNotExists(numbersAroundStar, getNumberFromMatrix(pMatrix, pRow+1, pCol-1))
+		}
+		if (pCol+1) <= len(pMatrix[pRow])-1 && unicode.IsNumber([]rune(pMatrix[pRow+1][pCol+1])[0]) {
+			numbersAroundStar = appendIfNotExists(numbersAroundStar, getNumberFromMatrix(pMatrix, pRow+1, pCol+1))
+		}
+	}
+
+	// Check the column to the left
+	if pCol > 0 {
+		if unicode.IsNumber([]rune(pMatrix[pRow][pCol-1])[0]) {
+			numbersAroundStar = appendIfNotExists(numbersAroundStar, getNumberFromMatrix(pMatrix, pRow, pCol-1))
+		}
+	}
+
+	// Check the column to the right
+	if pCol < len(pMatrix[pRow])-1 {
+		if unicode.IsNumber([]rune(pMatrix[pRow][pCol+1])[0]) {
+			numbersAroundStar = appendIfNotExists(numbersAroundStar, getNumberFromMatrix(pMatrix, pRow, pCol+1))
+		}
+	}
+	fmt.Println(numbersAroundStar)
+	return numbersAroundStar
+}
+
+func getNumberFromMatrix(pMatrix [][]string, pRow int, pCol int) int {
+	currentNumber := "" + string(pMatrix[pRow][pCol])
+	if pCol < len(pMatrix[pRow])-1 {
+		for i := pCol + 1; i <= len(pMatrix[pRow]) -1; i++ {
+			if unicode.IsNumber([]rune(pMatrix[pRow][i])[0]) {
+				currentNumber += string(pMatrix[pRow][i])
+			} else {
+				break
+			}
+		}
+	}
+	if pCol > 0 {
+		for i := pCol - 1; i >= 0; i-- {
+			if unicode.IsNumber([]rune(pMatrix[pRow][i])[0]) {
+				currentNumber = string(pMatrix[pRow][i]) + currentNumber
+			} else {
+				break
+			}
+		}
+	}
+
+	number, _ := strconv.Atoi(currentNumber)
+	return number
+}
+
+func appendIfNotExists(slice []int, i int) []int {
+    for _, ele := range slice {
+        if ele == i {
+            return slice
+        }
+    }
+    return append(slice, i)
 }
